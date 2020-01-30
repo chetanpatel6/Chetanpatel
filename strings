@@ -1,0 +1,28 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void strings()
+        {
+            string print=Console.ReadLine();
+            string gre = "Hello";
+            string gret = "Hy";
+            string final = gre + gret;
+            Console.WriteLine("length " + gre.Length);
+            Console.WriteLine(final);
+            Console.WriteLine(gre[0]);
+            Console.WriteLine(print.ToUpper());
+        }
+        static void Main(string[] args)
+        {
+            strings();
+            Console.ReadKey();
+        }
+    }
+}
