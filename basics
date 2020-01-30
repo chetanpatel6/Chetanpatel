@@ -1,0 +1,147 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void basic()
+        {
+            int a = 5;
+            string name = "Chetan";
+            float b = 5.5f;
+            bool c = true;
+            char d = 'D';
+            Console.WriteLine(name);
+            Console.WriteLine(b);
+            Console.WriteLine(c);
+            Console.WriteLine(d);
+        }
+
+        static void typecasting()
+        {
+            Console.WriteLine("Implicit Conversion");
+            int myInt = 9;//implict typecasting
+            double myDouble = myInt;       
+            Console.WriteLine(myInt);      
+            Console.WriteLine(myDouble);
+
+            Console.WriteLine("Explicit Conversion");
+            double myDou = 9.78;
+            int myIn = (int)myDouble;    // Manual casting: double to int
+            Console.WriteLine(myDou);   
+            Console.WriteLine(myIn);
+        }
+
+        static void userinput()
+        {
+            Console.WriteLine("Enter your name");
+            string print = Console.ReadLine();
+            Console.WriteLine(print);
+            Console.WriteLine(Convert.ToInt32(print));
+        }
+
+        static void operators()
+        {
+            int a = 5;
+            int b = 10;
+            a += a;
+            b = b / a;
+            int c = a * b;
+            Console.WriteLine("operators");
+            Console.WriteLine(a);
+            Console.WriteLine(b);
+            Console.WriteLine(c);
+        }
+
+        static void math()
+        {
+            Console.WriteLine("Math function");
+            int a = Math.Max(5, 10);
+            int b = Math.Min(5, 10);
+            double c = Math.Sqrt(25);
+            double d = Math.Abs(-4.5);
+            double e = Math.Round(5.67);
+            Console.WriteLine(a);
+            Console.WriteLine(b);
+            Console.WriteLine(c);
+            Console.WriteLine(d);
+            Console.WriteLine(e);
+        }
+
+        static void strings()
+        {
+            string gre = "Hello";
+            string gret = "Hy";
+            string final = gre + gret;
+            Console.WriteLine("length " + gre.Length);
+            Console.WriteLine(final);
+            Console.WriteLine(gre[0]);
+        }
+
+        static void ifelse()
+        {
+            int a = 15;
+            int b = 8;
+            if (a>b)
+            {
+                Console.WriteLine("A is greater");
+            }
+        }
+
+        static void whileloop()
+        {
+
+            Console.WriteLine("while loop");
+            int i=0;
+            while(i<6)
+            {
+                Console.WriteLine(i);
+                i++;
+            }
+        }
+
+        static void forloop()
+        {
+
+            Console.WriteLine("for loop");
+            int n = 4;
+            for(int i=0;i<n;i++)
+            {
+                Console.WriteLine(i);
+            }
+        }
+
+        static void array()
+        {
+            Console.WriteLine("arrays");
+            int[] myNumbers = { 5, 1, 8, 9 };
+            Array.Sort(myNumbers);
+            foreach (int i in myNumbers)
+            {
+                Console.WriteLine(i);
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            // The code provided will print ‘Hello World’ to the console.
+            // Press Ctrl+F5 (or go to Debug > Start Without Debugging) to run your app.
+            Console.WriteLine("Hello World!");
+            basic();
+            typecasting();
+            userinput();
+            operators();
+            math();
+            strings();
+            ifelse();
+            whileloop();
+            forloop();
+            array();
+            Console.ReadKey();
+        }
+    }
+}
