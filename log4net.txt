@@ -1,5 +1,5 @@
 [assembly: log4net.Config.XmlConfigurator(Watch = true)]
-
+ddddd
  <configSections>
     <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler, log4net"/>
   </configSections>
