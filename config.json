@@ -1,0 +1,13 @@
+{
+    "serverPort": 8080,
+    "emailAccounts": {
+        "Canon": {
+            "type": "IMAP",
+            "user": "chetanpatel_18@outlook.com",
+            "password": "chetan18",
+            "host": "outlook.office365.com",
+            "port": 993,
+            "tls": true
+        }
+    }
+}
