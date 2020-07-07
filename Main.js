@@ -2,7 +2,7 @@ var Imap = require('imap'),
     inspect = require('util').inspect,
     parser = require('addressparser'),
     config = require('./config.json');
-var nodemailer=require('nodemailer');
+var nodemailer = require('nodemailer');
 const simpleParser = require('mailparser').simpleParser;
 
 Test();
@@ -12,9 +12,9 @@ function Test() {
         //(imap,newMails)
         fetchNewMails(account, (imap, newMails) => {
             console.log(newMails);
-            sendMails(account,newMails,(response)=>{
-                console.log(response);
-            });
+            // sendMails(account, newMails, (response) => {
+            //     console.log(response);
+            // });
 
 
             // let processed=0;
@@ -60,11 +60,11 @@ function fetchNewMails(account, callback) {
         openInbox(function (err, box) {
             if (err) throw err;
             console.log(box.messages.total + ' message(s) found!');
-            
+
             // search
             imap.search(['UNSEEN'], function (err, results) {
-                if(err) throw err;
-                var f = imap.fetch(results, { bodies: '' ,markSeen:true});
+                if (err) throw err;
+                var f = imap.fetch(results, { bodies: '', markSeen: false });
                 var newMails = [];
                 f.on('message', function (msg, seqno) {
                     var mailFields = {
@@ -83,12 +83,12 @@ function fetchNewMails(account, callback) {
                             mailFields.name = address[0].name;
                             mailFields.email = address[0].address;
                             mailFields.text = mail.text;
-                            //   console.log(mail.from.text);
-                            //   console.log(mail.subject);
-                            //   console.log(mail.date)
-                            //   console.log(address[0].name);
-                            //   console.log(address[0].address);
-                            //   console.log(prefix + mail.text);
+                              console.log(mail.from.text);
+                              console.log(mail.subject);
+                              console.log(mail.date)
+                              console.log(address[0].name);
+                              console.log(address[0].address);
+                            console.log(mail.text);
                         });
 
                         // or, write to file
@@ -97,11 +97,8 @@ function fetchNewMails(account, callback) {
                     msg.once('attributes', function (attrs) {
                         //console.log('Attributes: %s', inspect(attrs, false, 8));
                         console.log('UID: %s', attrs.uid);
-                        console.log('Flags:%s',attrs.flags);
+                        console.log('Flags:%s', attrs.flags);
                     });
-                    msg.once("error", function () {
-                        console.log("Got an error");
-                    })
                     msg.once('end', function () {
                         newMails.push({
                             mail: mailFields,
@@ -140,31 +137,44 @@ function fetchNewMails(account, callback) {
     imap.connect();
 }
 
-function sendMails(account,newMails,callback){
-    var transporter = nodemailer.createTransport({
-        service: 'outlook',
-        auth: {
-          user: config.emailAccounts[account].user,
-          pass: config.emailAccounts[account].password
-        }
-      });
-      
-      var mailOptions = {
-        from: config.emailAccounts[account].user,
-        to: newMails[0].mail.email,
-        subject: 'Sending Email using Node.js',
-        text: 'Our client will be getting back to you in 2 days.'
-      };
-      
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-            callback(info.response);
-          // console.log('Email sent: ' + info.response);
-        }
-      });
-}
+// function sendMails(account, newMails, callback) {
+//     var transporter = nodemailer.createTransport({
+//         service: 'outlook',
+//         auth: {
+//             user: config.emailAccounts[account].user,
+//             pass: config.emailAccounts[account].password
+//         }
+//     });
+    
+//     var d=new Date(newMails[0].mail.date);
+//     d.setDate(d.getDate() + 2);
+//     // console.log(d.getDay());
+//     if (d.getDay() == 6 || d.getDay() == 0) {
+//         d.setDate(d.getDate() + 2)
+//     } else if (d.getDay() == 1) {
+//         d.setDate(d.getDate() + 1)
+//     }
+//     var n = d.toDateString();
+//     console.log(n);
+
+//     var text = 'Hi ' + newMails[0].mail.name + ',\nThank you for your email. We would love to help solve your issue.\nWe will get back to you in 2 days i.e., ('+ n +').';
+
+//     var mailOptions = {
+//         from: config.emailAccounts[account].user,
+//         to: newMails[0].mail.email,
+//         subject: 'Sending Email using Node.js',
+//         text: text
+//     };
+
+//     transporter.sendMail(mailOptions, function (error, info) {
+//         if (error) {
+//             console.log(error);
+//         } else {
+//             callback(info.response);
+//             // console.log('Email sent: ' + info.response);
+//         }
+//     });
+// }
 
 // Function processMail
 
