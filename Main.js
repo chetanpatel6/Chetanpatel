@@ -2,16 +2,42 @@ var Imap = require('imap'),
     inspect = require('util').inspect,
     parser = require('addressparser'),
     config = require('./config.json');
+    const MailParser = require('mailparser').MailParser;
 var nodemailer = require('nodemailer');
 const simpleParser = require('mailparser').simpleParser;
+// var Categories = require("Categories/categories.js");
 
 Test();
 
+// function handleMail(categories, account, imap, mail) {
+//     categories.init(account.categoryID, mail, function (statusObj) {
+//         if (statusObj.status) {
+//             categories.newMail(account.categoryID, mail, function (statusObj) {
+//                 if (statusObj.status) {
+//                     categories.reply(account.categoryID, mail, function (statusObj) {
+//                         if (statusObj.status) {
+//                             // Use node mailer to send reply
+//                         }
+//                     })
+//                 }
+//             });
+//         }
+//     })
+// }
+
 function Test() {
+    // let categories = new Categories(null, null, null);
+    // categories.initialize();
+
     for (account in config.emailAccounts) {
         //(imap,newMails)
         fetchNewMails(account, (imap, newMails) => {
+            // for (var i = 0;i<newMails.length;i++) {
+            //     handleMail(categories, account, imap, newMails[i])
+     
+            // }
             console.log(newMails);
+            // console.log(newMails[0].mail.subject);
             // sendMails(account, newMails, (response) => {
             //     console.log(response);
             // });
@@ -66,16 +92,27 @@ function fetchNewMails(account, callback) {
                 if (err) throw err;
                 var f = imap.fetch(results, { bodies: '', markSeen: false });
                 var newMails = [];
+                var msgsToProcess=0;
+                var allDone = false;
+
                 f.on('message', function (msg, seqno) {
-                    var mailFields = {
-                        subject: "",
-                        date: "",
-                        name: "",
-                        email: "",
-                        text: ""
-                    }
                     msg.on('body', function (stream, info) {
+                        let parserr = new MailParser();
+                        parserr.on('headers', headers => {
+                            console.log('header',headers.get('subject'));
+                        });
+                        msgsToProcess++;
+                        // console.log("Found Body: ", seqno, info)
                         simpleParser(stream, (err, mail) => {
+                            // console.log("Text: ", mail.text)
+                            var mailFields = {
+                                subject: "",
+                                date: "",
+                                name: "",
+                                email: "",
+                                text: ""
+                            }
+                            // console.log("Parsed Body: ", seqno, info)
                             var from = mail.from.text;
                             var address = parser(from);
                             mailFields.subject = mail.subject;
@@ -83,14 +120,14 @@ function fetchNewMails(account, callback) {
                             mailFields.name = address[0].name;
                             mailFields.email = address[0].address;
                             mailFields.text = mail.text;
-                              console.log(mail.from.text);
-                              console.log(mail.subject);
-                              console.log(mail.date)
-                              console.log(address[0].name);
-                              console.log(address[0].address);
-                            console.log(mail.text);
+                            newMails.push({
+                                mail: mailFields,
+                                // seqNo: seqno
+                            });
+                            if (msgsToProcess==newMails.length && allDone) {
+                                callback(imap, newMails);
+                            }
                         });
-
                         // or, write to file
                         //stream.pipe(fs.createWriteStream('msg-' + seqno + '-body.txt'));
                     });
@@ -100,17 +137,10 @@ function fetchNewMails(account, callback) {
                         console.log('Flags:%s', attrs.flags);
                     });
                     msg.once('end', function () {
-                        newMails.push({
-                            mail: mailFields,
-                            // seqNo: seqno
-                        });
 
                         console.log('Finished');
                     });
                 });
-
-                // console.log('Message #%d', seqno);
-                // var prefix = '(#' + seqno + ') ';
 
                 f.once('error', function (err) {
                     // callback(imap, newMails);
@@ -118,8 +148,11 @@ function fetchNewMails(account, callback) {
                     console.log('Fetch error:' + err);
                 });
                 f.once('end', function () {
+                    allDone = true;
                     // callback(imap, newMails);
-                    callback(imap, newMails);
+                    if (msgsToProcess==newMails.length && allDone) {
+                        callback(imap, newMails);
+                    }
                     console.log('Done fetching all messages!');
                     imap.end();
                 });
@@ -157,7 +190,7 @@ function fetchNewMails(account, callback) {
 //     var n = d.toDateString();
 //     console.log(n);
 
-//     var text = 'Hi ' + newMails[0].mail.name + ',\nThank you for your email. We would love to help solve your issue.\nWe will get back to you in 2 days i.e., ('+ n +').';
+//     var text = 'Hi ' + newMails[0].mail.name + ',\n\nThank you for your email. We would love to help solve your issue.\nWe will get back to you in 2 days i.e., ('+ n +').';
 
 //     var mailOptions = {
 //         from: config.emailAccounts[account].user,
@@ -176,7 +209,8 @@ function fetchNewMails(account, callback) {
 //     });
 // }
 
-// Function processMail
+
+//-------------Function processMail-------------//
 
 // function processMail(emailAccount, mail, callback) {
 
