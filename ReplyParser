@@ -1,0 +1,118 @@
+var replyParser = require("node-email-reply-parser");
+
+
+function processMail(emailContent, callback) {
+    var replyText = emailContent[0].mail.text;
+
+    var email = replyParser(replyText, false);
+    var flag = false;
+    var array = [];
+    var arr=[];    
+
+    // mailFields.text = email.getVisibleText();
+    for (i = 0; i < email.getFragments().length; i++) {
+        if (email.getFragments()[i].isQuoted() == true) {
+            var mailFields = {
+                date: "",
+                email: "",
+                text: "",
+            }
+            // console.log('Hello',(email.getFragments()[i].getContent()).replace(/(\r\n|\n|\r|[<>])/g,""));
+            var fields = email.getFragments()[i].getContent().replace(/(\r\n|\n|\r|[<>])/g, "");
+            fields = fields.replace(/\b(\.\www\.)|([,.])\s+(?=[A-Za-z])|(wrote:)/gi, "|").split("|");
+            //console.log(fields);
+            for (var i = 0; i < fields.length; i++) {
+                if (i == 0) {
+                    mailFields.date = fields[i];
+                } else if (i == 1) {
+                    mailFields.email = fields[i];
+                }
+                else if (fields[i].startsWith("On")) {
+                    for(var j=i;j<fields.length;j++)
+                    {
+                        arr.push(fields[j]);
+                        i++;
+                    }
+                    flag=true;
+                }
+                else {
+                    mailFields.text += fields[i] + ".";
+                }
+            }
+            //array.push({ mail: mailFields });
+        } else {
+            var mailFields = {
+                date: "",
+                email: "",
+                text: "",
+            }
+            mailFields.text = email.getFragments()[i].getContent();
+            mailFields.date = emailContent[0].mail.date;
+            mailFields.email = emailContent[0].mail.email;
+            array.push(mailFields);
+        }
+        
+    }
+    array.push(mailFields);
+    checkReplies(flag);
+
+    function checkReplies(flag)
+    {
+        if (flag==true){
+            var mailFields = {
+                date: "",
+                email: "",
+                text: "",
+            }
+            for (var i = 0; i < arr.length; i++) {
+                if (i == 0) {
+                    mailFields.date = arr[i];
+                } else if (i == 1) {
+                    mailFields.email = arr[i];
+                }
+                else if (arr[i].startsWith("On")) {
+                    for(var j=i;j<arr.length;j++)
+                    {
+                        arr.push(arr[j]);
+                        i++;
+                    }
+                    flag=true;
+                }
+                else {
+                    mailFields.text += arr[i] + ".";
+                    flag=false
+                }
+            }
+            array.push(mailFields);
+        }
+    }
+    checkReplies(flag); 
+    callback(array)
+}
+
+function test() {
+    var emailContent = [
+        {
+            mail: {
+                subject: 'Re: Sending Email using Node.js',
+                date: '2020-07-07T17:04:41.000Z',
+                name: 'chetan patel',
+                email: 'chetanpatel9740@gmail.com',
+                text: 'Thank you for your response.\n' +
+                '\n' +
+                'On Wed, 8 Jul 2020 at 23:08, <chetanpatel_18@outlook.com> wrote:\n' +   
+                '\n' +
+                '> Hi chetan patel,\n' +
+                '> Thank you for your email. We would love to help solve your issue.\n' +
+                '> We will get back to you in 2 days i.e., (Thu Jul 09 2020).\n' +       
+                '>\n'
+            }
+        }
+    ]
+
+    processMail(emailContent, (callback) => {
+        console.log('ProcessMail:', callback);
+    });
+}
+
+test();
